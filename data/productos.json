@@ -1,0 +1,102 @@
+[
+  {
+      "title": "Martillo",
+      "id": 1,
+      "description": "Martillo de acero.",
+      "code": "M001",
+      "price": 400,
+      "status": true,
+      "stock": 200,
+      "category": "Herramientas"
+  },
+  {
+      "id": 2,
+      "title": "Destornillador",
+      "description": "Set de destornilladores.",
+      "code": "D001",
+      "price": 300,
+      "status": true,
+      "stock": 150,
+      "category": "Herramientas"
+  },
+  {
+      "id": 3,
+      "title": "Taladro Eléctrico",
+      "description": "Taladro para perforar.",
+      "code": "T001",
+      "price": 8000,
+      "status": true,
+      "stock": 50,
+      "category": "Herramientas"
+  },
+  {
+      "id": 4,
+      "title": "Sierra Circular",
+      "description": "Sierra portátil.",
+      "code": "S001",
+      "price": 8500,
+      "status": true,
+      "stock": 30,
+      "category": "Herramientas"
+  },
+  {
+      "id": 5,
+      "title": "Caja de Herramientas",
+      "description": "Caja para guardar herramientas.",
+      "code": "C001",
+      "price": 1500,
+      "status": true,
+      "stock": 75,
+      "category": "Accesorios"
+  },
+  {
+      "id": 6,
+      "title": "Tijeras de Podar",
+      "description": "Tijeras para jardinería.",
+      "code": "TP001",
+      "price": 700,
+      "status": true,
+      "stock": 100,
+      "category": "Jardinería"
+  },
+  {
+      "id": 7,
+      "title": "Guantes de Trabajo",
+      "description": "Guantes de protección.",
+      "code": "G001",
+      "price": 400,
+      "status": true,
+      "stock": 120,
+      "category": "Seguridad"
+  },
+  {
+      "id": 8,
+      "title": "Cinta Métrica",
+      "description": "Cinta métrica de 5 m.",
+      "code": "CM001",
+      "price": 200,
+      "status": true,
+      "stock": 300,
+      "category": "Herramientas"
+  },
+  {
+      "id": 9,
+      "title": "Pintura Acrílica",
+      "description": "Pintura para interiores.",
+      "code": "PA001",
+      "price": 1200,
+      "status": true,
+      "stock": 40,
+      "category": "Pinturas"
+  },
+  {
+      "id": 10,
+      "title": "Escalera Plegable",
+      "description": "Escalera de aluminio.",
+      "code": "EP001",
+      "price": 4500,
+      "status": true,
+      "stock": 25,
+      "category": "Accesorios"
+  }
+]
