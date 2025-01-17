@@ -1,15 +1,13 @@
 import { Router } from 'express';
-import fs from 'fs/promises';
+import ProductsManager from '../managers/ProductsManager.js';
 
 const router = Router();
-const productsFilePath = 'data/productos.json';
 
 // Ruta para leer todos los productos
-router.get('/products', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
-        const data = await fs.readFile(productsFilePath, 'utf8');
-        const products = data ? JSON.parse(data) : [];
         const limit = parseInt(req.query.limit);
+        const products = await ProductsManager.getAllProducts();
 
         if (limit) {
             res.json(products.slice(0, limit));
@@ -17,18 +15,16 @@ router.get('/products', async (req, res) => {
             res.json(products);
         }
     } catch (err) {
-        res.status(500).json({ error: 'Failed to read products file' });
+        res.status(500).json({ error: err.message });
     }
 });
 
 // Ruta para leer un producto por su ID
-router.get('/products/:pid', async (req, res) => {
+router.get('/:pid', async (req, res) => {
     const id = parseInt(req.params.pid);
 
     try {
-        const data = await fs.readFile(productsFilePath, 'utf8');
-        const products = data ? JSON.parse(data) : [];
-        const product = products.find(p => p.id === id);
+        const product = await ProductsManager.getProductById(id);
 
         if (product) {
             res.json(product);
@@ -36,12 +32,12 @@ router.get('/products/:pid', async (req, res) => {
             res.status(404).json({ error: 'Product not found' });
         }
     } catch (err) {
-        res.status(500).json({ error: 'Failed to read products file' });
+        res.status(500).json({ error: err.message });
     }
 });
 
 // Ruta para agregar un nuevo producto
-router.post('/products', async (req, res) => {
+router.post('/', async (req, res) => {
     const { title, description, code, price, status = true, stock, category, thumbnails = [] } = req.body;
 
     if (!title || !description || !code || !price || !stock || !category) {
@@ -49,69 +45,73 @@ router.post('/products', async (req, res) => {
     }
 
     try {
-        const data = await fs.readFile(productsFilePath, 'utf8');
-        const products = data ? JSON.parse(data) : [];
-        const newProduct = {
-            id: products.length > 0 ? products[products.length - 1].id + 1 : 1,
+        const newProduct = await ProductsManager.addProduct({
             title,
             description,
             code,
             price,
-            status, 
+            status,
             stock,
             category,
             thumbnails
-        };
+        });
 
-        products.push(newProduct);
-        await fs.writeFile(productsFilePath, JSON.stringify(products, null, 2));
+        // Emitir evento de WebSocket
+        req.app.get('io').emit('updateProducts', await ProductsManager.getAllProducts());
+
         res.status(201).json(newProduct);
     } catch (err) {
-        res.status(500).json({ error: 'Failed to save product' });
+        res.status(500).json({ error: err.message });
     }
 });
 
 // Ruta para actualizar un producto
-router.put('/products/:pid', async (req, res) => {
+router.put('/:pid', async (req, res) => {
     const id = parseInt(req.params.pid);
     const { title, description, code, price, status, stock, category, thumbnails } = req.body;
 
     try {
-        const data = await fs.readFile(productsFilePath, 'utf8');
-        const products = data ? JSON.parse(data) : [];
-        const productIndex = products.findIndex(p => p.id === id);
+        const updatedProduct = await ProductsManager.updateProduct(id, {
+            title,
+            description,
+            code,
+            price,
+            status,
+            stock,
+            category,
+            thumbnails
+        });
 
-        if (productIndex === -1) {
+        if (!updatedProduct) {
             return res.status(404).json({ error: 'Product not found' });
         }
 
-        const updatedProduct = { ...products[productIndex], title, description, code, price, status, stock, category, thumbnails };
-        products[productIndex] = updatedProduct;
+        // Emitir evento de WebSocket
+        req.app.get('io').emit('updateProducts', await ProductsManager.getAllProducts());
 
-        await fs.writeFile(productsFilePath, JSON.stringify(products, null, 2));
         res.json(updatedProduct);
     } catch (err) {
-        res.status(500).json({ error: 'Failed to update product' });
+        res.status(500).json({ error: err.message });
     }
 });
 
 // Ruta para eliminar un producto
-router.delete('/products/:pid', async (req, res) => {
+router.delete('/:pid', async (req, res) => {
     const id = parseInt(req.params.pid);
 
     try {
-        const data = await fs.readFile(productsFilePath, 'utf8');
-        const products = data ? JSON.parse(data) : [];
-        const newProducts = products.filter(p => p.id !== id);
+        const deleted = await ProductsManager.deleteProduct(id);
 
-        if (newProducts.length === products.length) {
+        if (!deleted) {
             return res.status(404).json({ error: 'Product not found' });
         }
 
-        await fs.writeFile(productsFilePath, JSON.stringify(newProducts, null, 2));
+        // Emitir evento de WebSocket
+        req.app.get('io').emit('updateProducts', await ProductsManager.getAllProducts());
+
         res.status(204).send();
     } catch (err) {
-        res.status(500).json({ error: 'Failed to delete product' });
+        res.status(500).json({ error: err.message });
     }
 });
 

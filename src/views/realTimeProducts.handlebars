@@ -28,11 +28,19 @@
             productList.innerHTML = ''; // Limpiar la lista existente
             products.forEach(product => {
                 const li = document.createElement('li');
-                li.textContent = `${product.title} - ${product.price}`;
+                li.textContent = `${product.title} - $${product.price}`;
+
+                // Botón de eliminar
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Eliminar';
+                deleteButton.addEventListener('click', () => {
+                    socket.emit('deleteProduct', product.id);
+                });
+
+                li.appendChild(deleteButton);
                 productList.appendChild(li);
             });
         });
-
         // Agregar producto
         document.getElementById('product-form').addEventListener('submit', (e) => {
             e.preventDefault();
