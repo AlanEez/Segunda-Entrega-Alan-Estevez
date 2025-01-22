@@ -19,7 +19,7 @@ app.set('views', path.resolve('src/views'));
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.resolve('public')));
+app.use(express.static(path.resolve('src/public')));
 
 // Configuración de rutas
 app.use('/api/products', productsRouter);
@@ -30,15 +30,32 @@ app.use('/', viewsRouter);
 const server = createServer(app);
 const io = new Server(server);
 
+// Hacer que la instancia de io esté disponible en app
+app.set('io', io);
+
 io.on('connection', (socket) => {
     console.log('Nuevo cliente conectado');
 
+    // Evento para obtener productos
     socket.on('getProducts', async () => {
-        const products = await ProductsManager.getAllProducts();
-        socket.emit('updateProducts', products);
+        try {
+            const products = await ProductsManager.getAllProducts();
+            socket.emit('updateProducts', products);
+        } catch (err) {
+            console.error('Error fetching products:', err.message);
+        }
     });
 
+    // Evento para eliminar un producto
+    socket.on('deleteProduct', async (productId) => {
+        await ProductsManager.deleteProduct(productId);
+        const products = await ProductsManager.getAllProducts();
+        io.emit('updateProducts', products);
+    });
+
+    // Evento para agregar un producto
     socket.on('addProduct', async (product) => {
+        console.log('Intentando agregar producto:', product); // Log para depuración
         await ProductsManager.addProduct(product);
         const products = await ProductsManager.getAllProducts();
         io.emit('updateProducts', products);

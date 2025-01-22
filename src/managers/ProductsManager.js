@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import path from 'path';
 
 const productsFilePath = 'src/data/productos.json';
 
@@ -27,13 +28,16 @@ class ProductsManager {
 
     // Agregar un nuevo producto
     async addProduct(product) {
-        const { code } = product;
+        const { title, price, code } = product;
         try {
             const products = await this.getAllProducts();
+            console.log('Productos existentes:', products); // Muestra los productos existentes
+            console.log('Producto a agregar:', product); // Muestra el producto que intentas agregar
 
             // Validar que el campo "code" sea único
             const duplicateCode = products.find(prod => prod.code === code);
             if (duplicateCode) {
+                console.error(`Error: El código "${code}" ya está en uso por otro producto`);
                 throw new Error(`El código "${code}" ya está en uso por otro producto`);
             }
 
@@ -44,6 +48,7 @@ class ProductsManager {
 
             products.push(newProduct);
             await fs.writeFile(productsFilePath, JSON.stringify(products, null, 2));
+            console.log('Producto agregado exitosamente:', newProduct); // Muestra el producto agregado
             return newProduct;
         } catch (err) {
             console.error('Error agregando producto:', err);

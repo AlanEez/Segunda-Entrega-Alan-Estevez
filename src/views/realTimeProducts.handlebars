@@ -10,14 +10,15 @@
     <h1>Productos en Tiempo Real</h1>
     <ul id="product-list"></ul>
 
-    <form id="product-form">
-        <input type="text" id="title" placeholder="Título" required>
-        <input type="number" id="price" placeholder="Precio" required>
-        <button type="submit">Agregar Producto</button>
-    </form>
+<form id="product-form">
+    <input type="text" id="title" placeholder="Título" required>
+    <input type="number" id="price" placeholder="Precio" required>
+    <button type="submit">Agregar Producto</button>
+</form>
+
 
     <script>
-        const socket = io();
+        const socket = io('http://localhost:8080');
 
         // Solicitar la lista de productos al cargar la página
         socket.emit('getProducts');
@@ -41,15 +42,21 @@
                 productList.appendChild(li);
             });
         });
+
         // Agregar producto
         document.getElementById('product-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const title = document.getElementById('title').value;
             const price = document.getElementById('price').value;
+
+            // Emitir evento para agregar producto
             socket.emit('addProduct', { title, price });
+
+            // Limpiar los campos del formulario
             document.getElementById('title').value = '';
             document.getElementById('price').value = '';
         });
+
     </script>
 </body>
 </html>
